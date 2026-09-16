@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Bolicash - Operación de Dinámicas y Blindaje de Clientes</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap');
+
+    @page {
+      size: A4;
+      margin: 14mm 14mm 14mm 14mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #0f172a;
+      background-color: #ffffff;
+      line-height: 1.45;
+      font-size: 11.5px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-badge {
+      background: #059669;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 1px;
+    }
+
+    .brand-text h1 {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #0f172a;
+      line-height: 1.1;
+    }
+
+    .brand-text p {
+      font-size: 10px;
+      color: #059669;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .doc-meta {
+      text-align: right;
+    }
+
+    .doc-meta .badge {
+      display: inline-block;
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .doc-meta .subtitle {
+      font-size: 9.5px;
+      color: #64748b;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* SECTION TITLE */
+    .section {
+      margin-bottom: 15px;
+      page-break-inside: avoid;
+    }
+
+    .section-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .section-title .num {
+      background: #e2e8f0;
+      color: #0f172a;
+      font-size: 10px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+
+    /* 1. DILEMA CARDS */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .card-problem {
+      border: 1px solid #fed7aa;
+      background: #fffaf5;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .card-problem.danger {
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
+
+    .card-problem h3 {
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .card-problem.danger h3 {
+      color: #dc2626;
+    }
+
+    .card-problem.warning h3 {
+      color: #d97706;
+    }
+
+    .card-problem p {
+      font-size: 10.5px;
+      color: #334155;
+      line-height: 1.4;
+    }
+
+    /* 2. HOW IT WORKS STEPS */
+    .steps-flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .step-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 9px 10px;
+      position: relative;
+    }
+
+    .step-box .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      color: #059669;
+      margin-bottom: 3px;
+      text-transform: uppercase;
+    }
+
+    .step-box h4 {
+      font-size: 11px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 3px;
+    }
+
+    .step-box p {
+      font-size: 10px;
+      color: #475569;
+      line-height: 1.35;
+    }
+
+    /* 3. FLYER REQUISITO CARD (DARK GLOW STYLE) */
+    .card-requisito {
+      background: linear-gradient(135deg, #091a2e 0%, #030712 100%);
+      border: 1.5px solid #0284c7;
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: #f8fafc;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
+    }
+
+    .req-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .wallet-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(14, 165, 233, 0.15);
+      border: 1.5px solid #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .req-header {
+      flex: 1;
+    }
+
+    .req-title {
+      font-size: 11px;
+      font-weight: 900;
+      color: #38bdf8;
+      font-style: italic;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .req-title .badge-req {
+      background: rgba(56, 189, 248, 0.2);
+      color: #7dd3fc;
+      font-size: 8.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-style: normal;
+    }
+
+    .req-text {
+      font-size: 11px;
+      color: #e2e8f0;
+      margin-top: 3px;
+      font-weight: 500;
+    }
+
+    .req-text strong {
+      color: #38bdf8;
+    }
+
+    .req-warning {
+      background: rgba(245, 158, 11, 0.12);
+      border-left: 3px solid #f59e0b;
+      padding: 6px 10px;
+      border-radius: 0 4px 4px 0;
+      font-size: 10px;
+      color: #fef3c7;
+      margin: 8px 0;
+      font-weight: 600;
+    }
+
+    .req-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+      border-top: 1px solid rgba(56, 189, 248, 0.2);
+      padding-top: 8px;
+    }
+
+    .req-act-item {
+      font-size: 9.5px;
+      color: #cbd5e1;
+      line-height: 1.35;
+    }
+
+    .req-act-item strong {
+      color: #ffffff;
+      display: block;
+      margin-bottom: 1px;
+    }
+
+    /* 4. RULES TABLE */
+    table.rules-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      font-size: 10.5px;
+    }
+
+    table.rules-table th {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 7px 10px;
+      text-align: left;
+      font-weight: 800;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    table.rules-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+
+    table.rules-table tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    table.rules-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .rule-name {
+      font-weight: 800;
+      color: #0f172a;
+      white-space: nowrap;
+    }
+
+    .tag-auto {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    /* 5. ADMIN TOOLS */
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .admin-card {
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .admin-card .icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .admin-card h4 {
+      font-size: 11px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 2px;
+    }
+
+    .admin-card p {
+      font-size: 10px;
+      color: #475569;
+      line-height: 1.4;
+    }
+
+    /* FOOTER */
+    .footer {
+      margin-top: 14px;
+      padding-top: 8px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .footer .status {
+      color: #059669;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-badge">B</div>
+        <div class="brand-text">
+          <h1>Bolicash</h1>
+          <p>Operación de Dinámicas y Blindaje de Clientes</p>
+        </div>
+      </div>
+      <div class="doc-meta">
+        <span class="badge">Guía Operativa Oficial</span>
+        <div class="subtitle">Solución de Negocio &bull; Versión 2.0</div>
+      </div>
+    </header>
+
+    <!-- 1. EL DILEMA DE WHATSAPP -->
+    <section class="section">
+      <div class="section-title">
+        <span class="num">1</span>
+        El Dilema Actual en WhatsApp
+      </div>
+      <div class="grid-2">
+        <div class="card-problem danger">
+          <h3>❌ En Grupos Abiertos</h3>
+          <p>Los participantes pueden comentar sus jugadas, pero la <strong>competencia entra haciéndose pasar por jugador</strong>, copia los teléfonos de todos y les escribe por privado para robarse los clientes.</p>
+        </div>
+        <div class="card-problem warning">
+          <h3>⚠️ En Canales o Comunidades</h3>
+          <p>Los teléfonos quedan ocultos, pero <strong>nadie puede comentar ni participar</strong>, dejando las dinámicas de pronósticos completamente paralizadas y sin interacción.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. CÓMO OPERA LA WEB -->
+    <section class="section">
+      <div class="section-title">
+        <span class="num">2</span>
+        Cómo Opera la Web (El Puente Seguro)
+      </div>
+      <div class="steps-flow">
+        <div class="step-box">
+          <div class="step-num">Paso 1</div>
+          <h4>Enlace en tu Canal</h4>
+          <p>Publicas un único link en tu canal o comunidad de WhatsApp protegida.</p>
+        </div>
+        <div class="step-box">
+          <div class="step-num">Paso 2</div>
+          <h4>Jugada en 30s</h4>
+          <p>El cliente entra desde su celular, elige equipo, minuto y anota su WhatsApp.</p>
+        </div>
+        <div class="step-box">
+          <div class="step-num">Paso 3</div>
+          <h4>Túnel Ciego</h4>
+          <p>Cada jugador solo ve su propio comprobante. Nadie ve quién más participó.</p>
+        </div>
+        <div class="step-box" style="border-color: #a7f3d0; background: #ecfdf5;">
+          <div class="step-num" style="color: #047857;">Resultado</div>
+          <h4 style="color: #065f46;">Clientes Blindados</h4>
+          <p style="color: #047857;">Los infiltrados quedan a ciegas sin poder ver ni robar un solo número.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. VENTAS DE RECARGAS ANTES DEL PARTIDO -->
+    <section class="section">
+      <div class="section-title">
+        <span class="num">3</span>
+        Ventas Previas: Requisito de Recarga Obligatoria
+      </div>
+      <div class="card-requisito">
+        <div class="req-top">
+          <div class="wallet-icon">💳</div>
+          <div class="req-header">
+            <div class="req-title">
+              REQUISITO
+              <span class="badge-req">OBLIGATORIO</span>
+            </div>
+            <div class="req-text">
+              Haber realizado una recarga con <strong>BOLI~CASH</strong> el día de hoy antes del inicio del partido.
+            </div>
+          </div>
+        </div>
+
+        <div class="req-warning">
+          ⚠️ Advertencia en pantalla: Si no recargaste hoy antes del partido, tu participación no tendrá validez y NO podrás cobrar el premio aunque hayas acertado.
+        </div>
+
+        <div class="req-actions">
+          <div class="req-act-item">
+            <strong>1. Botón directo de compra antes de jugar:</strong>
+            La web incluye el acceso directo: <em>👉 ¿Aún no recargaste hoy? Toca aquí para recargar por WhatsApp</em>. El jugador te transfiere dinero antes del pitazo.
+          </div>
+          <div class="req-act-item">
+            <strong>2. Verificación infalible al entregar el premio:</strong>
+            En tu panel tocas <em>«Abrir WhatsApp»</em> al lado del ganador. Si en el chat tiene su comprobante de transferencia de hoy, cobra. Si no recargó, queda descalificado.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. LAS 4 REGLAS OFICIALES AUTOMATIZADAS -->
+    <section class="section">
+      <div class="section-title">
+        <span class="num">4</span>
+        Las 4 Reglas Oficiales del Afiche en Automático
+      </div>
+      <table class="rules-table">
+        <thead>
+          <tr>
+            <th style="width: 25%;">Regla del Afiche</th>
+            <th style="width: 20%;">Estado</th>
+            <th style="width: 55%;">Cómo lo Resuelve el Sistema</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="rule-name">1. Un solo intento</td>
+            <td><span class="tag-auto">100% Automático</span></td>
+            <td>Solo acepta 1 pronóstico por número de WhatsApp. Bloquea de inmediato intentos repetidos o dobles.</td>
+          </tr>
+          <tr>
+            <td class="rule-name">2. Límite de tiempo</td>
+            <td><span class="tag-auto">100% Automático</span></td>
+            <td><strong>Tú defines la fecha y hora de cierre en tu panel</strong> (ej. 12:40). El reloj en vivo bloquea la web al segundo exacto. Nadie envía jugadas tarde ni edita mensajes.</td>
+          </tr>
+          <tr>
+            <td class="rule-name">3. Premio compartido</td>
+            <td><span class="tag-auto">100% Automático</span></td>
+            <td>Si dos o más personas aciertan el mismo minuto, el sistema <strong>divide el premio en partes iguales</strong> (ej. 100 Bs entre 2 = 50 Bs c/u) y prepara el mensaje de cobro.</td>
+          </tr>
+          <tr>
+            <td class="rule-name">4. Resultado oficial</td>
+            <td><span class="tag-auto">Transparente</span></td>
+            <td>Se toma directamente el minuto y gol oficial publicado por Google, eliminando reclamos y sospechas de favoritismo.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 5. HERRAMIENTAS DE CONTROL -->
+    <section class="section">
+      <div class="section-title">
+        <span class="num">5</span>
+        Herramientas de Control para el Dueño
+      </div>
+      <div class="admin-grid">
+        <div class="admin-card">
+          <div class="icon">📊</div>
+          <div>
+            <h4>Exportar a Excel con 1 Clic</h4>
+            <p>Descargas tu lista limpia de clientes (nombre, WhatsApp verificado y fecha) lista para enviarles promociones masivas en próximos partidos.</p>
+          </div>
+        </div>
+        <div class="admin-card">
+          <div class="icon">🎟️</div>
+          <div>
+            <h4>Comprobante de Jugada Viral</h4>
+            <p>Al jugar, el cliente recibe su recibo en pantalla con un botón para compartir su pronóstico en sus estados de WhatsApp, trayéndote nuevos clientes recomendados gratis.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <span>Bolicash &bull; Sistema Web de Trivias &amp; Blindaje de Clientes</span>
+      <span class="status">&bull; Listo para Operar en Producción</span>
+    </footer>
+
+  </div>
+</body>
+</html>
