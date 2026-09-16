@@ -30,8 +30,9 @@ function formatearTiempo(ms: number): string {
   const s = segundos % 60;
   const dos = (n: number) => String(n).padStart(2, "0");
 
-  if (d > 0) return `${d}d ${dos(h)}h ${dos(m)}m`;
-  return `${dos(h)}:${dos(m)}:${dos(s)}`;
+  if (d > 0) return `${d}d ${dos(h)}h ${dos(m)}m ${dos(s)}s`;
+  if (h > 0) return `${dos(h)}h ${dos(m)}m ${dos(s)}s`;
+  return `${dos(m)}m ${dos(s)}s`;
 }
 
 function FilaRecibo({ etiqueta, valor }: { etiqueta: string; valor: ReactNode }) {
@@ -349,7 +350,7 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
           {/* PANTALLA DIGITAL ARCADE DEL TEMPORIZADOR CON RESPLANDOR   */}
           {/* ========================================================= */}
           <div className="mt-4 flex flex-col items-center justify-center">
-            <div className="relative w-full max-w-[280px] rounded-2xl bg-zinc-950 border border-dorado-500/40 px-5 py-2.5 text-center shadow-[0_0_25px_rgba(245,158,11,0.25)] overflow-hidden">
+            <div className="relative w-full max-w-[320px] rounded-2xl bg-zinc-950 border border-dorado-500/40 px-4 py-2.5 text-center shadow-[0_0_25px_rgba(245,158,11,0.25)] overflow-hidden">
               {/* Resplandor dorado de fondo detrás de los dígitos */}
               <div
                 className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-dorado-500/25 to-transparent blur-md"
@@ -360,7 +361,7 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
               </span>
               <p
                 suppressHydrationWarning
-                className="relative z-10 mt-0.5 font-mono text-2xl sm:text-3xl font-black tabular-nums text-dorado-400 tracking-wider drop-shadow-[0_0_14px_rgba(245,158,11,0.9)]"
+                className="relative z-10 mt-0.5 font-mono text-xl sm:text-2xl font-black tabular-nums text-dorado-400 tracking-wider drop-shadow-[0_0_14px_rgba(245,158,11,0.9)] whitespace-nowrap"
               >
                 {cerrada ? "00:00:00" : formatearTiempo(restante)}
               </p>
