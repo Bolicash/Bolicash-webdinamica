@@ -142,7 +142,7 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
             valor={<span className="text-secundario font-black">{boleto.equipo_seleccionado}</span>}
           />
           <FilaRecibo
-            etiqueta={esTirosEsquina ? "Tiros de Esquina" : "Minuto del Gol"}
+            etiqueta={esTirosEsquina ? "Tiros de Esquina" : "Primer Gol"}
             valor={
               <span className="font-mono text-sm font-black text-dorado-400">
                 {boleto.minuto_pronosticado}
@@ -247,7 +247,7 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
           <div className="flex items-center justify-between pb-2 border-b border-zinc-800/80">
             <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-dorado-400">
               <span className="h-2 w-2 rounded-full bg-dorado-400 shadow-[0_0_6px_var(--dorado-400)] animate-pulse" />
-              {esTirosEsquina ? "🚩 Tiros de Esquina" : "⚽ Minuto del Gol"}
+              {esTirosEsquina ? "🚩 Tiros de Esquina" : "⚽ Primer Gol y minuto"}
             </span>
 
             <span
