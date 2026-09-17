@@ -286,88 +286,6 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
             </span>
           </div>
 
-          {/* Banner de Premio con brillo dorado */}
-          <div className="mt-4 flex items-center justify-center">
-            <div className="px-6 py-2 rounded-xl bg-gradient-to-r from-dorado-600 via-dorado-500 to-dorado-600 text-zinc-950 font-black text-sm sm:text-base tracking-wider uppercase shadow-[0_0_20px_rgba(245,158,11,0.6)] border border-dorado-400">
-              🏆 PREMIO: {trivia.premio_monto ?? 100} Bs
-            </div>
-          </div>
-
-          {/* ========================================================= */}
-          {/* ENFRENTAMIENTO CON FONDO DIVIDIDO (DUEL PODS INTERACTIVOS) */}
-          {/* ========================================================= */}
-          <div className="mt-4">
-            <div className="text-center mb-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-                Toca un equipo para seleccionarlo
-              </span>
-            </div>
-
-            {/* Contenedor dividido en 2 compartimentos (Local vs Visitante) */}
-            <div className="relative grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-zinc-900/90 border-2 border-zinc-800 shadow-inner">
-              {/* Medallón central VS flotante */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dorado-400 bg-zinc-950 font-mono text-xs font-black text-dorado-400 shadow-[0_0_12px_rgba(245,158,11,0.6)]">
-                  VS
-                </span>
-              </div>
-
-              {/* Compartimento Izquierdo: EQUIPO LOCAL */}
-              <button
-                type="button"
-                onClick={() => setEquipo(trivia.equipo_a)}
-                className={`relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl transition-all duration-200 text-center cursor-pointer ${
-                  equipo === trivia.equipo_a
-                    ? "bg-gradient-to-b from-secundario/25 via-secundario/15 to-zinc-950 border-2 border-secundario shadow-[0_0_16px_rgba(12,172,7,0.45)] ring-1 ring-secundario"
-                    : "bg-zinc-950/80 border border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-800/50"
-                }`}
-              >
-                <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">
-                  Local
-                </span>
-                <span className="text-xs sm:text-sm font-black uppercase tracking-tight text-blanco line-clamp-2">
-                  {trivia.equipo_a}
-                </span>
-                <span
-                  className={`mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider transition-colors ${
-                    equipo === trivia.equipo_a
-                      ? "bg-secundario text-blanco shadow-sm"
-                      : "bg-zinc-800 text-zinc-400"
-                  }`}
-                >
-                  {equipo === trivia.equipo_a ? "✓ Elegido" : "Elegir"}
-                </span>
-              </button>
-
-              {/* Compartimento Derecho: EQUIPO VISITANTE */}
-              <button
-                type="button"
-                onClick={() => setEquipo(trivia.equipo_b)}
-                className={`relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl transition-all duration-200 text-center cursor-pointer ${
-                  equipo === trivia.equipo_b
-                    ? "bg-gradient-to-b from-secundario/25 via-secundario/15 to-zinc-950 border-2 border-secundario shadow-[0_0_16px_rgba(12,172,7,0.45)] ring-1 ring-secundario"
-                    : "bg-zinc-950/80 border border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-800/50"
-                }`}
-              >
-                <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">
-                  Visitante
-                </span>
-                <span className="text-xs sm:text-sm font-black uppercase tracking-tight text-blanco line-clamp-2">
-                  {trivia.equipo_b}
-                </span>
-                <span
-                  className={`mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider transition-colors ${
-                    equipo === trivia.equipo_b
-                      ? "bg-secundario text-blanco shadow-sm"
-                      : "bg-zinc-800 text-zinc-400"
-                  }`}
-                >
-                  {equipo === trivia.equipo_b ? "✓ Elegido" : "Elegir"}
-                </span>
-              </button>
-            </div>
-          </div>
-
           {/* ========================================================= */}
           {/* PANTALLA DIGITAL ARCADE DEL TEMPORIZADOR CON RESPLANDOR   */}
           {/* ========================================================= */}
@@ -392,70 +310,132 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
               </span>
             </div>
           </div>
+
+          {/* Banner de Premio con brillo dorado */}
+          <div className="mt-3.5 flex items-center justify-center">
+            <div className="px-6 py-2 rounded-xl bg-gradient-to-r from-dorado-600 via-dorado-500 to-dorado-600 text-zinc-950 font-black text-sm sm:text-base tracking-wider uppercase shadow-[0_0_20px_rgba(245,158,11,0.6)] border border-dorado-400">
+              🏆 PREMIO: {trivia.premio_monto ?? 100} Bs
+            </div>
+          </div>
         </header>
 
         {/* ========================================================= */}
         {/* CUERPO DEL FORMULARIO / CONSOLA TRAGAMONEDAS              */}
         {/* ========================================================= */}
         {cerrada ? (
-          <div className="p-6 text-center">
+          <div className="p-6 text-center flex flex-col gap-4">
+            {/* Enfrentamiento de referencia en estado cerrado */}
+            <div className="relative grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-zinc-900/90 border border-zinc-800">
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full border border-zinc-700 bg-zinc-950 font-mono text-[10px] font-black text-zinc-400">
+                  VS
+                </span>
+              </div>
+              <div className="p-3 text-center">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500 block mb-0.5">Local</span>
+                <span className="text-xs sm:text-sm font-black uppercase text-zinc-300 line-clamp-1">{trivia.equipo_a}</span>
+              </div>
+              <div className="p-3 text-center">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500 block mb-0.5">Visitante</span>
+                <span className="text-xs sm:text-sm font-black uppercase text-zinc-300 line-clamp-1">{trivia.equipo_b}</span>
+              </div>
+            </div>
+
             <p className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 text-xs font-semibold text-zinc-300">
               El tiempo para participar en esta dinámica ha finalizado.
             </p>
+
+            <div className="w-full">
+              <IndicadorActivos
+                total={pronosticos.length}
+                cargando={cargandoPronosticos}
+                onClick={() => setModalPronosticosAbierto(true)}
+              />
+            </div>
           </div>
         ) : (
           <form onSubmit={enviar} className="p-4 sm:p-5 flex flex-col gap-4">
             <input type="hidden" name="trivia_id" value={trivia.id} />
             <input type="hidden" name="equipo" value={equipo} />
 
-            {/* REQUISITO DE RECARGA: TICKET VIP DE ACCESO */}
-            <div className="rounded-2xl border border-dorado-500/30 bg-zinc-900/70 p-3.5 shadow-sm">
-              <div className="flex items-start gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-dorado-400/40 bg-dorado-500/10 text-dorado-400 shadow-sm">
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-4 w-4 fill-none stroke-current stroke-2"
-                    aria-hidden="true"
+            {/* ========================================================= */}
+            {/* 1. SELECTOR DE EQUIPO (LOCAL VS VISITANTE)                */}
+            {/* ========================================================= */}
+            <div>
+              <div className="text-center mb-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                  Toca un equipo para seleccionarlo
+                </span>
+              </div>
+
+              {/* Contenedor dividido en 2 compartimentos (Local vs Visitante) */}
+              <div className="relative grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-zinc-900/90 border-2 border-zinc-800 shadow-inner">
+                {/* Medallón central VS flotante */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dorado-400 bg-zinc-950 font-mono text-xs font-black text-dorado-400 shadow-[0_0_12px_rgba(245,158,11,0.6)]">
+                    VS
+                  </span>
+                </div>
+
+                {/* Compartimento Izquierdo: EQUIPO LOCAL */}
+                <button
+                  type="button"
+                  onClick={() => setEquipo(trivia.equipo_a)}
+                  className={`relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl transition-all duration-200 text-center cursor-pointer ${
+                    equipo === trivia.equipo_a
+                      ? "bg-gradient-to-b from-secundario/25 via-secundario/15 to-zinc-950 border-2 border-secundario shadow-[0_0_16px_rgba(12,172,7,0.45)] ring-1 ring-secundario"
+                      : "bg-zinc-950/80 border border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-800/50"
+                  }`}
+                >
+                  <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">
+                    Local
+                  </span>
+                  <span className="text-xs sm:text-sm font-black uppercase tracking-tight text-blanco line-clamp-2">
+                    {trivia.equipo_a}
+                  </span>
+                  <span
+                    className={`mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider transition-colors ${
+                      equipo === trivia.equipo_a
+                        ? "bg-secundario text-blanco shadow-sm"
+                        : "bg-zinc-800 text-zinc-400"
+                    }`}
                   >
-                    <rect x="2" y="5" width="20" height="14" rx="2" />
-                    <line x1="2" y1="10" x2="22" y2="10" />
-                  </svg>
-                </div>
+                    {equipo === trivia.equipo_a ? "✓ Elegido" : "Elegir"}
+                  </span>
+                </button>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-black uppercase tracking-wider text-blanco">
-                      Pase de Recarga
-                    </span>
-                    <span className="rounded-full border border-dorado-400/50 bg-dorado-500/20 px-2 py-0.2 font-mono text-[9px] font-black uppercase text-dorado-400">
-                      Obligatorio
-                    </span>
-                  </div>
-
-                  <p className="mt-1 text-[11px] text-zinc-300 leading-relaxed">
-                    Para cobrar tu premio en caso de acertar, debes haber realizado una recarga en{" "}
-                    <strong className="font-black text-blanco">Bolicash</strong> hoy antes del inicio del partido.
-                  </p>
-
-                  <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-zinc-800/80 pt-2.5">
-                    <span className="text-[10px] font-medium text-zinc-400">
-                      ¿Aún no recargaste hoy?
-                    </span>
-                    <a
-                      href="https://wa.me/?text=Hola%20BoliCash,%20quiero%20hacer%20una%20recarga%20para%20participar%20en%20la%20dinamica"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-secundario px-2.5 py-1 text-[11px] font-black uppercase text-blanco hover:opacity-90 shadow-sm transition-opacity"
-                    >
-                      <span>Recargar por WhatsApp</span>
-                      <IconoFlechaDerecha className="h-3 w-3" />
-                    </a>
-                  </div>
-                </div>
+                {/* Compartimento Derecho: EQUIPO VISITANTE */}
+                <button
+                  type="button"
+                  onClick={() => setEquipo(trivia.equipo_b)}
+                  className={`relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl transition-all duration-200 text-center cursor-pointer ${
+                    equipo === trivia.equipo_b
+                      ? "bg-gradient-to-b from-secundario/25 via-secundario/15 to-zinc-950 border-2 border-secundario shadow-[0_0_16px_rgba(12,172,7,0.45)] ring-1 ring-secundario"
+                      : "bg-zinc-950/80 border border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-800/50"
+                  }`}
+                >
+                  <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">
+                    Visitante
+                  </span>
+                  <span className="text-xs sm:text-sm font-black uppercase tracking-tight text-blanco line-clamp-2">
+                    {trivia.equipo_b}
+                  </span>
+                  <span
+                    className={`mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider transition-colors ${
+                      equipo === trivia.equipo_b
+                        ? "bg-secundario text-blanco shadow-sm"
+                        : "bg-zinc-800 text-zinc-400"
+                    }`}
+                  >
+                    {equipo === trivia.equipo_b ? "✓ Elegido" : "Elegir"}
+                  </span>
+                </button>
               </div>
             </div>
 
-            {/* CONTROL DEL CONTADOR / SLOT REEL STEPPER */}
+            {/* ========================================================= */}
+            {/* 2. CONTROL DEL CONTADOR / SLOT REEL STEPPER               */}
+            {/* ========================================================= */}
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-3.5">
               <div className="flex items-center justify-between mb-2">
                 <label htmlFor="minuto" className="text-xs font-black uppercase tracking-wider text-zinc-300">
@@ -537,7 +517,9 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
               </div>
             </div>
 
-            {/* INPUT: NOMBRE COMPLETO */}
+            {/* ========================================================= */}
+            {/* 3. INPUT: NOMBRE COMPLETO                                 */}
+            {/* ========================================================= */}
             <div>
               <label htmlFor="nombre" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-zinc-300">
                 Tu Nombre Completo
@@ -561,7 +543,9 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
               </div>
             </div>
 
-            {/* INPUT: WHATSAPP CON SELECTOR DE PAÍSES */}
+            {/* ========================================================= */}
+            {/* 4. INPUT: WHATSAPP CON SELECTOR DE PAÍSES                 */}
+            {/* ========================================================= */}
             <div>
               <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-zinc-300">
                 WhatsApp para cobrar tu premio
@@ -587,6 +571,62 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
               </div>
             </div>
 
+            {/* ========================================================= */}
+            {/* SEPARADOR VISUAL (LEY DE AGRUPACIÓN DE LA GESTALT)        */}
+            {/* ========================================================= */}
+            <div className="py-2" aria-hidden="true">
+              <div className="h-px w-full bg-gradient-to-r from-transparent via-zinc-700/80 to-transparent" />
+            </div>
+
+            {/* ========================================================= */}
+            {/* 5. REQUISITO DE RECARGA: TICKET VIP DE ACCESO             */}
+            {/* ========================================================= */}
+            <div className="rounded-2xl border border-dorado-500/30 bg-zinc-900/70 p-3.5 shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-dorado-400/40 bg-dorado-500/10 text-dorado-400 shadow-sm">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-4 w-4 fill-none stroke-current stroke-2"
+                    aria-hidden="true"
+                  >
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <line x1="2" y1="10" x2="22" y2="10" />
+                  </svg>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black uppercase tracking-wider text-blanco">
+                      Pase de Recarga
+                    </span>
+                    <span className="rounded-full border border-dorado-400/50 bg-dorado-500/20 px-2 py-0.2 font-mono text-[9px] font-black uppercase text-dorado-400">
+                      Obligatorio
+                    </span>
+                  </div>
+
+                  <p className="mt-1 text-[11px] text-zinc-300 leading-relaxed">
+                    Para cobrar tu premio en caso de acertar, debes haber realizado una recarga en{" "}
+                    <strong className="font-black text-blanco">Bolicash</strong> hoy antes del inicio del partido.
+                  </p>
+
+                  <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-zinc-800/80 pt-2.5">
+                    <span className="text-[10px] font-medium text-zinc-400">
+                      ¿Aún no recargaste hoy?
+                    </span>
+                    <a
+                      href="https://wa.me/?text=Hola%20BoliCash,%20quiero%20hacer%20una%20recarga%20para%20participar%20en%20la%20dinamica"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-secundario px-2.5 py-1 text-[11px] font-black uppercase text-blanco hover:opacity-90 shadow-sm transition-opacity"
+                    >
+                      <span>Recargar por WhatsApp</span>
+                      <IconoFlechaDerecha className="h-3 w-3" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {resultado?.ok === false && (
               <p
                 role="alert"
@@ -597,7 +637,7 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
             )}
 
             {/* ========================================================= */}
-            {/* REVISAR PRONÓSTICOS EN VIVO ANTES DE VOTAR               */}
+            {/* 6. REVISAR PRONÓSTICOS EN VIVO ANTES DE VOTAR             */}
             {/* ========================================================= */}
             <div className="w-full pt-1">
               <IndicadorActivos
@@ -608,7 +648,7 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
             </div>
 
             {/* ========================================================= */}
-            {/* BOTÓN ARCADE 3D DE CONFIRMACIÓN: "CONFIRMAR JUGADA"        */}
+            {/* 7. BOTÓN ARCADE 3D DE CONFIRMACIÓN: "CONFIRMAR JUGADA"    */}
             {/* ========================================================= */}
             <div className="mt-2 relative group">
               {/* Marco exterior con halo dorado brillante */}
