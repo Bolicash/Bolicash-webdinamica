@@ -216,7 +216,7 @@ stateDiagram-v2
   `REQUISITO: Haber realizado una recarga con BOLI~CASH el día de hoy antes del inicio del partido.`
 * **Botón de Venta Directa:** Enlace visible:  
   `👉 ¿Aún no recargaste hoy? Toca aquí para recargar por WhatsApp antes de jugar`  
-  (Redirige a `wa.me/[WHATSAPP_CAJERO]?text=Hola%20BoliCash,%20quiero%20hacer%20una%20recarga%20para%20participar%20en%20la%20trivia`).
+  (Redirige a `wa.me/59175340019?text=Hola%20BoliCash,%20quiero%20hacer%20una%20recarga%20para%20participar%20en%20la%20trivia`).
 
 #### D. Selector de Pronóstico
 1. **Selección de Equipo:** Dos tarjetas/botones seleccionables con el nombre y escudo de cada equipo. El usuario debe tocar uno obligatoriamente.

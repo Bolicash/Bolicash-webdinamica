@@ -614,7 +614,7 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
                       ¿Aún no recargaste hoy?
                     </span>
                     <a
-                      href="https://wa.me/?text=Hola%20BoliCash,%20quiero%20hacer%20una%20recarga%20para%20participar%20en%20la%20dinamica"
+                      href="https://wa.me/59175340019?text=Hola%20BoliCash,%20quiero%20hacer%20una%20recarga%20para%20participar%20en%20la%20dinamica"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 rounded-lg bg-secundario px-2.5 py-1 text-[11px] font-black uppercase text-blanco hover:opacity-90 shadow-sm transition-opacity"
