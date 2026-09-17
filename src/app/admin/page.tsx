@@ -9,7 +9,7 @@ import {
   IconoTrivia,
 } from "@/components/iconos";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
-import { estaVencida } from "@/lib/trivias";
+import { estaVencida, formatearFechaHoraBolivia } from "@/lib/fechas";
 import FormularioCrearTrivia from "@/components/formulario-crear-trivia";
 
 type FilaTrivia = {
@@ -191,12 +191,7 @@ export default async function PanelDashboard() {
                   </span>
                 </div>
                 <span className="block font-mono text-[11px] text-texto-suave mt-0.5">
-                  {new Intl.DateTimeFormat("es", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }).format(new Date(trivia.fecha_inicio))}
+                  {formatearFechaHoraBolivia(trivia.fecha_inicio)}
                   {" · "}
                   {trivia.publicada ? "Pública" : "Oculta"}
                 </span>

@@ -30,6 +30,4 @@ export async function obtenerTriviasActivas(): Promise<TriviaActiva[]> {
   return data as TriviaActiva[];
 }
 
-export function estaVencida(fechaInicio: string): boolean {
-  return new Date(fechaInicio).getTime() <= Date.now();
-}
+export { estaVencida } from "@/lib/fechas";

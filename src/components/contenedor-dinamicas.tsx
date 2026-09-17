@@ -98,7 +98,7 @@ export default function ContenedorDinamicas({
             />
             <div className="flex flex-col">
               <span className="text-sm sm:text-base font-black tracking-wider text-blanco uppercase font-mono leading-tight">
-                BOLI<span className="text-dorado-400">CASH</span>
+                BOLI~<span className="text-dorado-400">CASH</span>
               </span>
               <span className="text-[10px] font-bold text-zinc-400 tracking-tight flex items-center gap-1.5 leading-none mt-0.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />

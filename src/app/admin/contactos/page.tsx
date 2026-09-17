@@ -1,4 +1,5 @@
 import { crearClienteAdmin } from "@/lib/supabase/admin";
+import { formatearFechaHoraBolivia } from "@/lib/fechas";
 
 type FilaContacto = {
   nombre: string;
@@ -56,13 +57,7 @@ export default async function ContactosPage() {
                   </td>
                   <td className="px-4 py-3 font-mono text-texto-suave whitespace-nowrap">{contacto.whatsapp}</td>
                   <td className="px-4 py-3 font-mono text-texto-suave text-[11px] whitespace-nowrap">
-                    {new Intl.DateTimeFormat("es", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }).format(new Date(contacto.creado_en))}
+                    {formatearFechaHoraBolivia(contacto.creado_en)}
                   </td>
                 </tr>
               ))}

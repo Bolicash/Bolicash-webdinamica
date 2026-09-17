@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { IconoFlechaDerecha } from "@/components/iconos";
 import { anularResultadoGanadores, type FilaGanador } from "@/acciones/ganadores";
+import { formatearFechaHoraBolivia } from "@/lib/fechas";
 
 export type TriviaGanador = {
   id: string;
@@ -276,13 +277,7 @@ export default function FiltroGanadores({
                     </td>
 
                     <td className="px-4 py-3.5 font-mono text-texto-suave text-[11px]">
-                      {new Intl.DateTimeFormat("es", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                      }).format(new Date(g.registrado_en))}
+                      {formatearFechaHoraBolivia(g.registrado_en)}
                     </td>
 
                     <td className="px-4 py-3.5 font-mono font-black text-secundario text-sm">

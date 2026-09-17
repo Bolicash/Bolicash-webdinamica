@@ -157,7 +157,7 @@ export default function BarraLateralAdmin() {
       </div>
 
       {/* 3. Barra Lateral de Escritorio (md: y superiores) - Fija permanentemente en viewport */}
-      <aside className="hidden shrink-0 border-r border-borde bg-texto md:sticky md:top-0 md:flex md:h-dvh md:w-64 md:flex-col md:p-6 md:overflow-y-auto text-superficie z-30">
+      <aside className="hidden md:flex md:fixed md:inset-y-0 md:left-0 md:w-64 md:h-dvh md:flex-col md:p-6 md:overflow-y-auto shrink-0 border-r border-borde bg-texto text-superficie z-30 shadow-sm">
         <div className="flex items-center gap-3 md:mb-6">
           <Image
             src="/logo-bolicash.avif"
@@ -168,7 +168,7 @@ export default function BarraLateralAdmin() {
           />
           <div>
             <p className="text-sm font-bold uppercase tracking-wider text-superficie">
-              Bolicash
+              Boli~cash
             </p>
             <p className="text-[11px] text-superficie/60">Panel admin</p>
           </div>

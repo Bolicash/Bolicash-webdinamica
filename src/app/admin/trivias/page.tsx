@@ -5,7 +5,7 @@ import { IconoChevronDerecha } from "@/components/iconos";
 import InterruptorPublicada from "@/components/interruptor-publicada";
 import ModalEditarDinamica from "@/components/modal-editar-dinamica";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
-import { estaVencida } from "@/lib/trivias";
+import { estaVencida, formatearFechaCortaBolivia, formatearFechaHoraBolivia } from "@/lib/fechas";
 
 type FilaTrivia = {
   id: string;
@@ -27,7 +27,7 @@ function nombrePlantilla(id: string): string {
 }
 
 function EstadoBadge({ estado, vencida }: { estado: string; vencida: boolean }) {
-  if (estado === "activa" && vencida) {
+  if (vencida) {
     return (
       <span
         title="La hora de cierre ya pasó. La dinámica no acepta más jugadas y está oculta en la web."
@@ -57,6 +57,14 @@ function EstadoBadge({ estado, vencida }: { estado: string; vencida: boolean }) 
 export default async function TriviasPage() {
   const db = await crearClienteAdmin();
   if (!db) return null;
+
+  // Auto-sincronizar: Si alguna dinámica ya pasó su fecha límite y sigue publicada en web,
+  // se despublica automáticamente (publicada = false) para que quede oculta, sin alterar su fecha límite.
+  await db
+    .from("trivias")
+    .update({ publicada: false })
+    .eq("publicada", true)
+    .lte("fecha_inicio", new Date().toISOString());
 
   const { data, error: errorLista } = await db.rpc("listar_trivias_admin");
   const trivias = (data ?? []) as FilaTrivia[];
@@ -130,12 +138,7 @@ export default async function TriviasPage() {
                   Cierre
                 </span>
                 <span className="text-texto font-medium">
-                  {new Intl.DateTimeFormat("es", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }).format(new Date(trivia.fecha_inicio))}
+                  {formatearFechaCortaBolivia(trivia.fecha_inicio)}
                 </span>
               </div>
               <div>
@@ -151,8 +154,11 @@ export default async function TriviasPage() {
             {/* En Web y Participantes */}
             <div className="flex items-center justify-between border-t border-borde pt-2.5 text-xs">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-texto-suave">En Web:</span>
-                <InterruptorPublicada id={trivia.id} publicada={trivia.publicada} />
+                <InterruptorPublicada
+                  id={trivia.id}
+                  publicada={trivia.publicada}
+                  deshabilitado={estaVencida(trivia.fecha_inicio)}
+                />
               </div>
 
               <Link
@@ -174,7 +180,13 @@ export default async function TriviasPage() {
                   <input type="hidden" name="estado" value="activa" />
                   <button
                     type="submit"
-                    className="rounded-boton border border-borde px-3 py-1 text-xs font-bold text-texto hover:bg-primario-claro"
+                    disabled={estaVencida(trivia.fecha_inicio)}
+                    title={
+                      estaVencida(trivia.fecha_inicio)
+                        ? "Tiempo vencido. Haz clic en 'Editar' para reprogramar una nueva fecha futura y reactivarla."
+                        : "Activar dinámica"
+                    }
+                    className="rounded-boton border border-borde px-3 py-1 text-xs font-bold text-texto hover:bg-primario-claro disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Activar
                   </button>
@@ -219,7 +231,7 @@ export default async function TriviasPage() {
             <thead>
               <tr className="border-b border-borde bg-primario-claro/50 font-mono uppercase tracking-wider text-texto-suave">
                 <th className="px-5 py-3.5 font-bold min-w-[200px] whitespace-nowrap">Partido</th>
-                <th className="px-5 py-3.5 font-bold whitespace-nowrap">Termina</th>
+                <th className="px-5 py-3.5 font-bold whitespace-nowrap">Cierre</th>
                 <th className="px-5 py-3.5 font-bold whitespace-nowrap">Premio</th>
                 <th className="px-5 py-3.5 font-bold whitespace-nowrap">Estado</th>
                 <th className="px-5 py-3.5 font-bold whitespace-nowrap">En Web</th>
@@ -249,13 +261,7 @@ export default async function TriviasPage() {
                   </td>
 
                 <td className="px-5 py-4 font-mono text-texto-suave whitespace-nowrap">
-                  {new Intl.DateTimeFormat("es", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }).format(new Date(trivia.fecha_inicio))}
+                  {formatearFechaHoraBolivia(trivia.fecha_inicio)}
                 </td>
 
                 <td className="px-5 py-4 font-mono font-bold text-secundario whitespace-nowrap">
@@ -270,7 +276,11 @@ export default async function TriviasPage() {
                 </td>
 
                 <td className="px-5 py-4 whitespace-nowrap">
-                  <InterruptorPublicada id={trivia.id} publicada={trivia.publicada} />
+                  <InterruptorPublicada
+                    id={trivia.id}
+                    publicada={trivia.publicada}
+                    deshabilitado={estaVencida(trivia.fecha_inicio)}
+                  />
                 </td>
 
                 <td className="px-5 py-4 whitespace-nowrap">
@@ -292,7 +302,13 @@ export default async function TriviasPage() {
                         <input type="hidden" name="estado" value="activa" />
                         <button
                           type="submit"
-                          className="rounded-boton border border-borde px-2.5 py-1 text-[11px] font-bold text-texto hover:bg-primario-claro"
+                          disabled={estaVencida(trivia.fecha_inicio)}
+                          title={
+                            estaVencida(trivia.fecha_inicio)
+                              ? "Tiempo vencido. Haz clic en 'Editar' para reprogramar una nueva fecha futura y reactivarla."
+                              : "Activar dinámica"
+                          }
+                          className="rounded-boton border border-borde px-2.5 py-1 text-[11px] font-bold text-texto hover:bg-primario-claro disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           Activar
                         </button>

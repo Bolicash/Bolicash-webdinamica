@@ -68,7 +68,8 @@ export async function actualizarTrivia(
   const plantillaRaw = String(formData.get("tipo_plantilla") ?? "primer_gol_minuto");
   let plantilla = normalizarPlantillaDb(plantillaRaw);
   const fecha = String(formData.get("fecha_inicio") ?? "");
-  const estado = String(formData.get("estado") ?? "activa");
+  const estadoRaw = String(formData.get("estado") ?? "activa");
+  const estado = estadoRaw === "vencida" ? "finalizada" : estadoRaw;
   const publicada = formData.get("publicada") === "on";
   const premioMonto = Math.max(1, parseInt(String(formData.get("premio_monto") ?? "100"), 10) || 100);
 
@@ -95,8 +96,16 @@ export async function actualizarTrivia(
   if (!id || !equipoA || !equipoB || !fecha) {
     return { error: "Completa todos los campos obligatorios." };
   }
-  if (Number.isNaN(new Date(fecha).getTime())) {
+  const fechaDate = new Date(fecha);
+  if (Number.isNaN(fechaDate.getTime())) {
     return { error: "La fecha y hora no son válidas." };
+  }
+
+  if ((estado === "activa" || publicada) && fechaDate.getTime() <= Date.now()) {
+    return {
+      error:
+        "Para reactivar o publicar la dinámica, la fecha y hora de cierre deben ser posteriores al momento actual.",
+    };
   }
 
   // Intentamos primero con RPC
@@ -168,6 +177,14 @@ export async function cambiarEstadoTrivia(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const estado = String(formData.get("estado") ?? "");
   if (!id || !["borrador", "activa", "finalizada"].includes(estado)) return;
+
+  // Si intentan activar directamente una trivia cuya fecha ya venció, no permitirlo
+  if (estado === "activa") {
+    const { data: t } = await db.from("trivias").select("fecha_inicio").eq("id", id).maybeSingle();
+    if (t?.fecha_inicio && new Date(t.fecha_inicio).getTime() <= Date.now()) {
+      return;
+    }
+  }
 
   const { error } = await db.rpc("cambiar_estado_admin", { p_id: id, p_estado: estado });
   if (error) {

@@ -14,6 +14,7 @@ import { SelectorPais } from "@/components/selector-pais";
 import { IconoFlechaDerecha } from "@/components/iconos";
 import { participar, type ResultadoParticipar } from "@/acciones/participar";
 import type { TriviaActiva } from "@/lib/trivias";
+import { formatearFechaHoraBolivia } from "@/lib/fechas";
 
 const CHIPS_MINUTOS = [15, 30, 45, 60, 75, 90];
 const CHIPS_CORNERS = [3, 5, 7, 9, 12, 15];
@@ -53,7 +54,7 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
 
   const [restante, setRestante] = useState(() => tiempoRestante(trivia.fecha_inicio));
   const [equipo, setEquipo] = useState("");
-  const [minuto, setMinuto] = useState<number>(valorInicial);
+  const [minuto, setMinuto] = useState<number | "">(valorInicial);
   const [whatsapp, setWhatsapp] = useState<string>("");
   const [resultado, setResultado] = useState<ResultadoParticipar | null>(null);
   const [pendiente, setPendiente] = useState(false);
@@ -70,7 +71,10 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
   const cerrada = restante === 0;
 
   function ajustarMinuto(delta: number) {
-    setMinuto((prev) => Math.min(maxValor, Math.max(0, prev + delta)));
+    setMinuto((prev) => {
+      const base = prev === "" ? 0 : prev;
+      return Math.min(maxValor, Math.max(0, base + delta));
+    });
   }
 
   function copiarCodigo(id: string) {
@@ -85,6 +89,15 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
     if (pendiente || cerrada) return;
     if (!equipo) {
       setResultado({ ok: false, error: "Selecciona el equipo que anotará." });
+      return;
+    }
+    if (minuto === "" || Number.isNaN(Number(minuto))) {
+      setResultado({
+        ok: false,
+        error: esTirosEsquina
+          ? "Indica la cantidad estimada de tiros de esquina."
+          : "Indica el minuto estimado del gol.",
+      });
       return;
     }
     if (!whatsapp || !isValidPhoneNumber(whatsapp)) {
@@ -158,12 +171,7 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
           />
           <FilaRecibo
             etiqueta="Fecha y Hora"
-            valor={new Intl.DateTimeFormat("es", {
-              day: "2-digit",
-              month: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            }).format(new Date(boleto.registrado_en))}
+            valor={formatearFechaHoraBolivia(boleto.registrado_en)}
           />
           <FilaRecibo
             etiqueta="ID de Jugada"
@@ -206,7 +214,7 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
         {/* Arco dorado limpio */}
         <div className="relative flex items-center justify-center px-8 sm:px-12 py-1.5 rounded-t-2xl border-t-2 border-x-2 border-dorado-400 bg-gradient-to-b from-dorado-500 via-dorado-600 to-zinc-950 shadow-[0_0_20px_rgba(245,158,11,0.45)]">
           <span className="font-mono text-xs sm:text-sm font-black tracking-widest text-blanco drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] uppercase flex items-center gap-1.5 whitespace-nowrap">
-            <span className="text-dorado-400">★</span> 777 BOLICASH <span className="text-dorado-400">★</span>
+            <span className="text-dorado-400">★</span> 777 BOLI~CASH <span className="text-dorado-400">★</span>
           </span>
         </div>
       </div>
@@ -365,6 +373,9 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
               >
                 {cerrada ? "00:00:00" : formatearTiempo(restante)}
               </p>
+              <span className="relative z-10 mt-1 block font-mono text-[10px] text-zinc-400">
+                ⏱ Cierre: <strong className="text-zinc-300 font-bold">{formatearFechaHoraBolivia(trivia.fecha_inicio)}</strong>
+              </span>
             </div>
           </div>
         </header>
@@ -437,7 +448,9 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
                   {esTirosEsquina ? "Cantidad de tiros de esquina" : "Minuto exacto del gol"}
                 </label>
                 <span className="font-mono text-xs font-black text-dorado-400">
-                  {esTirosEsquina ? `${minuto} CÓRNERS` : `${minuto}' MINUTO`}
+                  {esTirosEsquina
+                    ? `${minuto === "" ? "—" : minuto} CÓRNERS`
+                    : `${minuto === "" ? "—" : `${minuto}'`} MINUTO`}
                 </span>
               </div>
 
@@ -461,10 +474,18 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
                     min={0}
                     max={maxValor}
                     inputMode="numeric"
+                    placeholder="0"
                     value={minuto}
                     onChange={(e) => {
-                      const v = Number(e.target.value);
-                      if (!Number.isNaN(v)) setMinuto(Math.min(maxValor, Math.max(0, v)));
+                      const val = e.target.value;
+                      if (val === "") {
+                        setMinuto("");
+                        return;
+                      }
+                      const v = parseInt(val, 10);
+                      if (!Number.isNaN(v)) {
+                        setMinuto(Math.min(maxValor, Math.max(0, v)));
+                      }
                     }}
                     className="w-full text-center rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 font-mono text-lg font-black text-blanco outline-none focus:border-dorado-400 focus:ring-1 focus:ring-dorado-400 shadow-inner [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />

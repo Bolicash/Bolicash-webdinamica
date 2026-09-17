@@ -29,11 +29,13 @@ export default async function PanelLayout({ children }: { children: ReactNode })
   if (!data.user) redirect("/login");
 
   return (
-    <div className="flex min-h-dvh flex-col bg-fondo md:flex-row w-full max-w-full overflow-x-hidden">
+    <div className="min-h-dvh bg-fondo w-full">
       <BarraLateralAdmin />
-      <main className="flex w-full min-w-0 max-w-full flex-1 flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
-        {children}
-      </main>
+      <div className="flex flex-col min-h-dvh md:pl-64 w-full">
+        <main className="flex w-full min-w-0 max-w-full flex-1 flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
