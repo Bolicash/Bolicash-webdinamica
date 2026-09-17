@@ -228,7 +228,7 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
         {/* Arco dorado limpio */}
         <div className="relative flex items-center justify-center px-8 sm:px-12 py-1.5 rounded-t-2xl border-t-2 border-x-2 border-dorado-400 bg-gradient-to-b from-dorado-500 via-dorado-600 to-zinc-950 shadow-[0_0_20px_rgba(245,158,11,0.45)]">
           <span className="font-mono text-xs sm:text-sm font-black tracking-widest text-blanco drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] uppercase flex items-center gap-1.5 whitespace-nowrap">
-            <span className="text-dorado-400">★</span> 777 BOLI~CASH <span className="text-dorado-400">★</span>
+            <span className="text-dorado-400">★</span> 1XBET BOLI~CASH <span className="text-dorado-400">★</span>
           </span>
         </div>
       </div>
