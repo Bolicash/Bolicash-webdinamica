@@ -42,6 +42,15 @@ yarn-error.log*
 # supabase local
 supabase/.temp/
 
+# documentos y previews locales (no versionar)
+DOCUMENTO_CLIENTE_BOLICASH.md
+DOCUMENTO_CLIENTE_BOLICASH.pdf
+documento_cliente.html
+documento_cliente_template.html
+login_preview.png
+logo_preview.png
+preview_pdf.png
+
 # vercel
 .vercel
 
