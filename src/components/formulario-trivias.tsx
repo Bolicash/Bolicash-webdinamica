@@ -2,6 +2,7 @@
 
 import {
   startTransition,
+  useCallback,
   useEffect,
   useState,
   type FormEvent,
@@ -15,6 +16,12 @@ import { IconoFlechaDerecha } from "@/components/iconos";
 import { participar, type ResultadoParticipar } from "@/acciones/participar";
 import type { TriviaActiva } from "@/lib/trivias";
 import { formatearFechaHoraBolivia } from "@/lib/fechas";
+import IndicadorActivos from "@/components/indicador-activos";
+import ModalPronosticosEnVivo from "@/components/modal-pronosticos-en-vivo";
+import {
+  obtenerPronosticosPublicos,
+  type PronosticoPublico,
+} from "@/acciones/pronosticos-publicos";
 
 const CHIPS_MINUTOS = [15, 30, 45, 60, 75, 90];
 const CHIPS_CORNERS = [3, 5, 7, 9, 12, 15];
@@ -58,7 +65,27 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
   const [whatsapp, setWhatsapp] = useState<string>("");
   const [resultado, setResultado] = useState<ResultadoParticipar | null>(null);
   const [pendiente, setPendiente] = useState(false);
-  const [copiado, setCopiado] = useState(false);
+  const [modalPronosticosAbierto, setModalPronosticosAbierto] = useState(false);
+  const [pronosticos, setPronosticos] = useState<PronosticoPublico[]>([]);
+  const [cargandoPronosticos, setCargandoPronosticos] = useState(false);
+
+  const cargarPronosticos = useCallback(async () => {
+    setCargandoPronosticos(true);
+    try {
+      const res = await obtenerPronosticosPublicos(trivia.id);
+      if (res.ok) {
+        setPronosticos(res.pronosticos);
+      }
+    } catch (err) {
+      console.error("Error al cargar pronósticos en vivo:", err);
+    } finally {
+      setCargandoPronosticos(false);
+    }
+  }, [trivia.id]);
+
+  useEffect(() => {
+    cargarPronosticos();
+  }, [cargarPronosticos]);
 
   useEffect(() => {
     const temporizador = setInterval(
@@ -74,13 +101,6 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
     setMinuto((prev) => {
       const base = prev === "" ? 0 : prev;
       return Math.min(maxValor, Math.max(0, base + delta));
-    });
-  }
-
-  function copiarCodigo(id: string) {
-    navigator.clipboard.writeText(id).then(() => {
-      setCopiado(true);
-      setTimeout(() => setCopiado(false), 2000);
     });
   }
 
@@ -110,18 +130,18 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
     setPendiente(true);
     startTransition(() => {
       participar(datos)
-        .then(setResultado)
+        .then((res) => {
+          setResultado(res);
+          if (res.ok) {
+            cargarPronosticos();
+          }
+        })
         .finally(() => setPendiente(false));
     });
   }
 
   if (resultado?.ok) {
     const { boleto } = resultado;
-    const detalleJugada = esTirosEsquina
-      ? `${boleto.minuto_pronosticado} tiros de esquina de ${boleto.equipo_seleccionado}`
-      : `gol de ${boleto.equipo_seleccionado} en el minuto ${boleto.minuto_pronosticado}'`;
-
-    const mensajeWhatsApp = `¡Hola! Registré mi jugada en Bolicash para ${trivia.equipo_a} vs ${trivia.equipo_b}: ${detalleJugada}. Mi código de jugada es ${boleto.id.slice(0, 8)}.`;
 
     return (
       <section className="relative w-full max-w-[550px] mx-auto rounded-3xl border-2 border-dorado-500/70 bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 p-6 shadow-2xl shadow-dorado-500/15 overflow-hidden">
@@ -141,9 +161,6 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
               Ticket Oficial Bolicash
             </h2>
           </div>
-          <span className="rounded-full border border-dorado-400/50 bg-dorado-500/10 px-3 py-1 font-mono text-xs font-black text-dorado-400 shadow-sm">
-            #{boleto.id.slice(0, 6).toUpperCase()}
-          </span>
         </div>
 
         <div className="mt-4 divide-y divide-zinc-800/80 bg-zinc-900/60 rounded-2xl border border-zinc-800 p-4">
@@ -173,34 +190,31 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
             etiqueta="Fecha y Hora"
             valor={formatearFechaHoraBolivia(boleto.registrado_en)}
           />
-          <FilaRecibo
-            etiqueta="ID de Jugada"
-            valor={<span className="font-mono text-[10px] text-zinc-500 break-all">{boleto.id}</span>}
-          />
         </div>
 
         <div className="mt-6 flex flex-col gap-2.5">
-          <a
-            href={`https://wa.me/?text=${encodeURIComponent(mensajeWhatsApp)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-secundario px-4 py-3 text-xs font-black uppercase tracking-wider text-blanco hover:opacity-95 shadow-lg shadow-secundario/25 transition-all active:scale-[0.99]"
-          >
-            Compartir comprobante en WhatsApp
-          </a>
-
           <button
             type="button"
-            onClick={() => copiarCodigo(boleto.id)}
-            className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 px-4 py-2.5 text-xs font-bold text-zinc-300 hover:text-blanco hover:bg-zinc-800 transition-colors"
+            onClick={() => setModalPronosticosAbierto(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-dorado-500 via-dorado-600 to-dorado-500 px-4 py-3 text-xs font-black uppercase tracking-wider text-zinc-950 hover:brightness-110 shadow-lg shadow-dorado-500/25 transition-all active:scale-[0.99] cursor-pointer"
           >
-            {copiado ? "✓ Código copiado al portapapeles" : "Copiar código de jugada"}
+            <span>Ver qué votaron los participantes ({pronosticos.length})</span>
+            <IconoFlechaDerecha className="h-4 w-4" />
           </button>
         </div>
 
         <p className="mt-4 text-center text-xs text-zinc-400">
           Si tu jugada resulta ganadora, el equipo de Bolicash te contactará por WhatsApp.
         </p>
+
+        <ModalPronosticosEnVivo
+          abierto={modalPronosticosAbierto}
+          onCerrar={() => setModalPronosticosAbierto(false)}
+          trivia={trivia}
+          pronosticos={pronosticos}
+          cargando={cargandoPronosticos}
+          onRecargar={cargarPronosticos}
+        />
       </section>
     );
   }
@@ -268,7 +282,7 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
               }`}
             >
               <span className={`h-1.5 w-1.5 rounded-full ${cerrada ? "bg-zinc-500" : "bg-secundario animate-pulse"}`} />
-              {cerrada ? "Cerrado" : "Abierto para jugar"}
+              {cerrada ? "Cerrado" : "Abierto"}
             </span>
           </div>
 
@@ -583,6 +597,17 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
             )}
 
             {/* ========================================================= */}
+            {/* REVISAR PRONÓSTICOS EN VIVO ANTES DE VOTAR               */}
+            {/* ========================================================= */}
+            <div className="w-full pt-1">
+              <IndicadorActivos
+                total={pronosticos.length}
+                cargando={cargandoPronosticos}
+                onClick={() => setModalPronosticosAbierto(true)}
+              />
+            </div>
+
+            {/* ========================================================= */}
             {/* BOTÓN ARCADE 3D DE CONFIRMACIÓN: "CONFIRMAR JUGADA"        */}
             {/* ========================================================= */}
             <div className="mt-2 relative group">
@@ -607,6 +632,15 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
             </div>
           </form>
         )}
+
+        <ModalPronosticosEnVivo
+          abierto={modalPronosticosAbierto}
+          onCerrar={() => setModalPronosticosAbierto(false)}
+          trivia={trivia}
+          pronosticos={pronosticos}
+          cargando={cargandoPronosticos}
+          onRecargar={cargarPronosticos}
+        />
       </section>
     </div>
   );

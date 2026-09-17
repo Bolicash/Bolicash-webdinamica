@@ -227,18 +227,7 @@ export default function ContenedorDinamicas({
         onTouchEnd={onTouchEnd}
         className="flex-1 w-full flex flex-col items-center justify-center gap-6 px-4 py-6 sm:py-10"
       >
-        {/* Logo Avatar Bolicash decorativo sobre la máquina */}
-        <header className="flex flex-col items-center text-center -mb-2">
-          <Image
-            src="/logo-bolicash.avif"
-            alt="Bolicash Logo"
-            width={112}
-            height={112}
-            priority
-            className="h-20 w-20 sm:h-24 sm:w-24 rounded-full object-contain drop-shadow-2xl hover:scale-105 transition-transform"
-          />
-          <h1 className="sr-only">Bolicash - Dinámicas Deportivas</h1>
-        </header>
+        <h1 className="sr-only">Bolicash - Dinámicas Deportivas</h1>
 
         {/* Máquina Tragamonedas (Jackpot) con 550px de ancho en Desktop */}
         <div className="w-full max-w-[550px] flex flex-col items-center mx-auto">
