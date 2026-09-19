@@ -107,7 +107,7 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
   function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
     if (pendiente || cerrada) return;
-    if (!equipo) {
+    if (!esTirosEsquina && !equipo) {
       setResultado({ ok: false, error: "Selecciona el equipo que anotará." });
       return;
     }
@@ -127,6 +127,9 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
     const datos = new FormData(evento.currentTarget);
     datos.set("prefijo", "");
     datos.set("numero", whatsapp);
+    if (esTirosEsquina) {
+      datos.set("equipo", "Total Partido");
+    }
     setPendiente(true);
     startTransition(() => {
       participar(datos)
@@ -168,16 +171,23 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
             etiqueta="Encuentro"
             valor={`${trivia.equipo_a} vs ${trivia.equipo_b}`}
           />
+          {esTirosEsquina ? (
+            <FilaRecibo
+              etiqueta="Dinámica"
+              valor={<span className="text-secundario font-black">🚩 Tiros de Esquina (Total Partido)</span>}
+            />
+          ) : (
+            <FilaRecibo
+              etiqueta="Equipo Elegido"
+              valor={<span className="text-secundario font-black">{boleto.equipo_seleccionado}</span>}
+            />
+          )}
           <FilaRecibo
-            etiqueta="Equipo Elegido"
-            valor={<span className="text-secundario font-black">{boleto.equipo_seleccionado}</span>}
-          />
-          <FilaRecibo
-            etiqueta={esTirosEsquina ? "Tiros de Esquina" : "Primer Gol"}
+            etiqueta={esTirosEsquina ? "Tu Pronóstico" : "Primer Gol"}
             valor={
               <span className="font-mono text-sm font-black text-dorado-400">
                 {boleto.minuto_pronosticado}
-                {esTirosEsquina ? " córners" : "'"}
+                {esTirosEsquina ? " córners en el partido" : "'"}
               </span>
             }
           />
@@ -356,82 +366,127 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
         ) : (
           <form onSubmit={enviar} className="p-4 sm:p-5 flex flex-col gap-4">
             <input type="hidden" name="trivia_id" value={trivia.id} />
-            <input type="hidden" name="equipo" value={equipo} />
+            <input type="hidden" name="equipo" value={esTirosEsquina ? "Total Partido" : equipo} />
 
             {/* ========================================================= */}
-            {/* 1. SELECTOR DE EQUIPO (LOCAL VS VISITANTE)                */}
+            {/* 1. SECCIÓN DE ENCUENTRO / EQUIPOS                         */}
             {/* ========================================================= */}
-            <div>
-              <div className="text-center mb-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-                  Toca un equipo para seleccionarlo
-                </span>
-              </div>
-
-              {/* Contenedor dividido en 2 compartimentos (Local vs Visitante) */}
-              <div className="relative grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-zinc-900/90 border-2 border-zinc-800 shadow-inner">
-                {/* Medallón central VS flotante */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dorado-400 bg-zinc-950 font-mono text-xs font-black text-dorado-400 shadow-[0_0_12px_rgba(245,158,11,0.6)]">
-                    VS
+            {esTirosEsquina ? (
+              <div className="rounded-2xl border-2 border-dorado-500/40 bg-zinc-950/80 p-3.5 shadow-inner">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-dorado-400/40 bg-dorado-500/15 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-dorado-400">
+                    <span className="h-1.5 w-1.5 rounded-full bg-dorado-400 animate-pulse" />
+                    🚩 Córners Totales del Partido
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 font-mono">
+                    Ambos Equipos
                   </span>
                 </div>
 
-                {/* Compartimento Izquierdo: EQUIPO LOCAL */}
-                <button
-                  type="button"
-                  onClick={() => setEquipo(trivia.equipo_a)}
-                  className={`relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl transition-all duration-200 text-center cursor-pointer ${
-                    equipo === trivia.equipo_a
-                      ? "bg-gradient-to-b from-secundario/25 via-secundario/15 to-zinc-950 border-2 border-secundario shadow-[0_0_16px_rgba(12,172,7,0.45)] ring-1 ring-secundario"
-                      : "bg-zinc-950/80 border border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-800/50"
-                  }`}
-                >
-                  <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">
-                    Local
-                  </span>
-                  <span className="text-xs sm:text-sm font-black uppercase tracking-tight text-blanco line-clamp-2">
-                    {trivia.equipo_a}
-                  </span>
-                  <span
-                    className={`mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider transition-colors ${
-                      equipo === trivia.equipo_a
-                        ? "bg-secundario text-blanco shadow-sm"
-                        : "bg-zinc-800 text-zinc-400"
-                    }`}
-                  >
-                    {equipo === trivia.equipo_a ? "✓ Elegido" : "Elegir"}
-                  </span>
-                </button>
+                {/* Showcase del Enfrentamiento sin botones de elegir */}
+                <div className="relative grid grid-cols-2 gap-2 p-2 rounded-xl bg-zinc-900/90 border border-zinc-800">
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full border border-dorado-400 bg-zinc-950 font-mono text-[10px] font-black text-dorado-400 shadow-[0_0_10px_rgba(245,158,11,0.5)]">
+                      VS
+                    </span>
+                  </div>
 
-                {/* Compartimento Derecho: EQUIPO VISITANTE */}
-                <button
-                  type="button"
-                  onClick={() => setEquipo(trivia.equipo_b)}
-                  className={`relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl transition-all duration-200 text-center cursor-pointer ${
-                    equipo === trivia.equipo_b
-                      ? "bg-gradient-to-b from-secundario/25 via-secundario/15 to-zinc-950 border-2 border-secundario shadow-[0_0_16px_rgba(12,172,7,0.45)] ring-1 ring-secundario"
-                      : "bg-zinc-950/80 border border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-800/50"
-                  }`}
-                >
-                  <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">
-                    Visitante
+                  <div className="p-2.5 text-center">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-500 block mb-0.5">
+                      Local
+                    </span>
+                    <span className="text-xs sm:text-sm font-black uppercase text-blanco line-clamp-2">
+                      {trivia.equipo_a}
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 text-center">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-500 block mb-0.5">
+                      Visitante
+                    </span>
+                    <span className="text-xs sm:text-sm font-black uppercase text-blanco line-clamp-2">
+                      {trivia.equipo_b}
+                    </span>
+                  </div>
+                </div>
+
+                <p className="mt-2 text-center text-[11px] font-medium text-zinc-300">
+                  ⚽ No tienes que elegir equipo. Pronostica la <strong className="text-dorado-400 font-bold">cantidad total</strong> de tiros de esquina de todo el partido.
+                </p>
+              </div>
+            ) : (
+              <div>
+                <div className="text-center mb-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                    Toca un equipo para seleccionarlo
                   </span>
-                  <span className="text-xs sm:text-sm font-black uppercase tracking-tight text-blanco line-clamp-2">
-                    {trivia.equipo_b}
-                  </span>
-                  <span
-                    className={`mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider transition-colors ${
-                      equipo === trivia.equipo_b
-                        ? "bg-secundario text-blanco shadow-sm"
-                        : "bg-zinc-800 text-zinc-400"
+                </div>
+
+                {/* Contenedor dividido en 2 compartimentos (Local vs Visitante) */}
+                <div className="relative grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-zinc-900/90 border-2 border-zinc-800 shadow-inner">
+                  {/* Medallón central VS flotante */}
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dorado-400 bg-zinc-950 font-mono text-xs font-black text-dorado-400 shadow-[0_0_12px_rgba(245,158,11,0.6)]">
+                      VS
+                    </span>
+                  </div>
+
+                  {/* Compartimento Izquierdo: EQUIPO LOCAL */}
+                  <button
+                    type="button"
+                    onClick={() => setEquipo(trivia.equipo_a)}
+                    className={`relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl transition-all duration-200 text-center cursor-pointer ${
+                      equipo === trivia.equipo_a
+                        ? "bg-gradient-to-b from-secundario/25 via-secundario/15 to-zinc-950 border-2 border-secundario shadow-[0_0_16px_rgba(12,172,7,0.45)] ring-1 ring-secundario"
+                        : "bg-zinc-950/80 border border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-800/50"
                     }`}
                   >
-                    {equipo === trivia.equipo_b ? "✓ Elegido" : "Elegir"}
-                  </span>
-                </button>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">
+                      Local
+                    </span>
+                    <span className="text-xs sm:text-sm font-black uppercase tracking-tight text-blanco line-clamp-2">
+                      {trivia.equipo_a}
+                    </span>
+                    <span
+                      className={`mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider transition-colors ${
+                        equipo === trivia.equipo_a
+                          ? "bg-secundario text-blanco shadow-sm"
+                          : "bg-zinc-800 text-zinc-400"
+                      }`}
+                    >
+                      {equipo === trivia.equipo_a ? "✓ Elegido" : "Elegir"}
+                    </span>
+                  </button>
+
+                  {/* Compartimento Derecho: EQUIPO VISITANTE */}
+                  <button
+                    type="button"
+                    onClick={() => setEquipo(trivia.equipo_b)}
+                    className={`relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl transition-all duration-200 text-center cursor-pointer ${
+                      equipo === trivia.equipo_b
+                        ? "bg-gradient-to-b from-secundario/25 via-secundario/15 to-zinc-950 border-2 border-secundario shadow-[0_0_16px_rgba(12,172,7,0.45)] ring-1 ring-secundario"
+                        : "bg-zinc-950/80 border border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-800/50"
+                    }`}
+                  >
+                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">
+                      Visitante
+                    </span>
+                    <span className="text-xs sm:text-sm font-black uppercase tracking-tight text-blanco line-clamp-2">
+                      {trivia.equipo_b}
+                    </span>
+                    <span
+                      className={`mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider transition-colors ${
+                        equipo === trivia.equipo_b
+                          ? "bg-secundario text-blanco shadow-sm"
+                          : "bg-zinc-800 text-zinc-400"
+                      }`}
+                    >
+                      {equipo === trivia.equipo_b ? "✓ Elegido" : "Elegir"}
+                    </span>
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* ========================================================= */}
             {/* 2. CONTROL DEL CONTADOR / SLOT REEL STEPPER               */}
@@ -439,11 +494,11 @@ export default function FormularioTrivia({ trivia }: { trivia: TriviaActiva }) {
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-3.5">
               <div className="flex items-center justify-between mb-2">
                 <label htmlFor="minuto" className="text-xs font-black uppercase tracking-wider text-zinc-300">
-                  {esTirosEsquina ? "Cantidad de tiros de esquina" : "Minuto exacto del gol"}
+                  {esTirosEsquina ? "Total tiros de esquina del partido" : "Minuto exacto del gol"}
                 </label>
                 <span className="font-mono text-xs font-black text-dorado-400">
                   {esTirosEsquina
-                    ? `${minuto === "" ? "—" : minuto} CÓRNERS`
+                    ? `${minuto === "" ? "—" : minuto} CÓRNERS EN TOTAL`
                     : `${minuto === "" ? "—" : `${minuto}'`} MINUTO`}
                 </span>
               </div>

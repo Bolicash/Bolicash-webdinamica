@@ -18,11 +18,29 @@ export async function guardarYBuscarGanadores(
   if (!db) return { error: "Supabase no está configurado." };
 
   const triviaId = String(formData.get("trivia_id") ?? "");
-  const equipo = String(formData.get("equipo_ganador") ?? "").trim();
+  let equipo = String(formData.get("equipo_ganador") ?? "").trim();
   const minuto = Number(formData.get("minuto_ganador") ?? "");
 
+  const { data: triviaData } = await db
+    .from("trivias")
+    .select("tipo_plantilla")
+    .eq("id", triviaId)
+    .single();
+
+  const esTirosEsquina =
+    triviaData?.tipo_plantilla === "tiros_esquina" ||
+    triviaData?.tipo_plantilla === "minuto_gol_equipo";
+
+  if (esTirosEsquina && !equipo) {
+    equipo = "Total Partido";
+  }
+
   if (!triviaId || !equipo || !Number.isInteger(minuto) || minuto < 0 || minuto > 120) {
-    return { error: "Selecciona trivia, equipo ganador y minuto (0-120)." };
+    return {
+      error: esTirosEsquina
+        ? "Ingresa una cantidad válida de tiros de esquina (0-120)."
+        : "Selecciona trivia, equipo ganador y minuto (0-120).",
+    };
   }
 
   const guardado = await db.rpc("guardar_resultado_admin", {

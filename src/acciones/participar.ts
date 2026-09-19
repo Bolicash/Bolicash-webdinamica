@@ -41,7 +41,7 @@ export async function participar(formData: FormData): Promise<ResultadoParticipa
 
   const revalidacion = await db
     .from("trivias")
-    .select("id, equipo_a, equipo_b, publicada, fecha_inicio")
+    .select("id, equipo_a, equipo_b, tipo_plantilla, publicada, fecha_inicio")
     .eq("id", triviaId)
     .limit(1);
   const trivia = revalidacion.data?.[0];
@@ -52,15 +52,24 @@ export async function participar(formData: FormData): Promise<ResultadoParticipa
   if (new Date(trivia.fecha_inicio).getTime() <= Date.now()) {
     return { ok: false, error: "El formulario ya cerró." };
   }
-  if (equipo !== trivia.equipo_a && equipo !== trivia.equipo_b) {
-    return { ok: false, error: "Selecciona uno de los dos equipos." };
+
+  const esTirosEsquina =
+    trivia.tipo_plantilla === "tiros_esquina" || trivia.tipo_plantilla === "minuto_gol_equipo";
+
+  let equipoFinal = equipo;
+  if (esTirosEsquina) {
+    equipoFinal = "Total Partido";
+  } else {
+    if (equipo !== trivia.equipo_a && equipo !== trivia.equipo_b) {
+      return { ok: false, error: "Selecciona uno de los dos equipos." };
+    }
   }
 
   const { data, error } = await db.rpc("registrar_participacion", {
     p_trivia_id: triviaId,
     p_nombre: nombre,
     p_whatsapp: whatsapp,
-    p_equipo_seleccionado: equipo,
+    p_equipo_seleccionado: equipoFinal,
     p_minuto_pronosticado: minuto,
   });
 

@@ -53,7 +53,7 @@ export default function FiltroGanadores({
       const esTirosEsquina =
         trivia.tipo_plantilla === "tiros_esquina" || trivia.tipo_plantilla === "minuto_gol_equipo";
       const detalleAcierto = esTirosEsquina
-        ? `${trivia.minuto_ganador_real} tiros de esquina de ${trivia.equipo_ganador_real}`
+        ? `${trivia.minuto_ganador_real} tiros de esquina en total del partido`
         : `gol de ${trivia.equipo_ganador_real} en el minuto ${trivia.minuto_ganador_real}'`;
 
       const mensaje = `¡Hola ${g.nombre}! Te felicitamos de parte de Bolicash 🏆⚽. ¡Le acertaste al resultado con tu jugada en el partido ${trivia.equipo_a} vs ${trivia.equipo_b} (${detalleAcierto})!\n\nAcertaron un total de ${total} ${total === 1 ? "persona (¡ganador único!)" : "personas"}. Tu premio correspondiente de ${premioTotal} Bs es de ${monto} Bs.\n\nPor favor envíanos tu comprobante de haber recargado hoy en Bolicash para transferirte tu premio de inmediato.`;
@@ -195,8 +195,9 @@ export default function FiltroGanadores({
                 Resultado
               </span>
               <span className="font-mono text-xs font-black text-secundario">
-                {trivia.equipo_ganador_real} ({trivia.minuto_ganador_real}
-                {trivia.tipo_plantilla === "tiros_esquina" || trivia.tipo_plantilla === "minuto_gol_equipo" ? " córners" : "'"})
+                {trivia.tipo_plantilla === "tiros_esquina" || trivia.tipo_plantilla === "minuto_gol_equipo"
+                  ? `${trivia.minuto_ganador_real} córners en total`
+                  : `${trivia.equipo_ganador_real} (${trivia.minuto_ganador_real}')`}
               </span>
             </div>
 
@@ -223,7 +224,7 @@ export default function FiltroGanadores({
         <p className="mt-3 text-xs text-zinc-300 leading-relaxed">
           {ganadores.length === 0
             ? trivia.tipo_plantilla === "tiros_esquina" || trivia.tipo_plantilla === "minuto_gol_equipo"
-              ? `Ningún hincha acertó los ${trivia.minuto_ganador_real} tiros de esquina de ${trivia.equipo_ganador_real}. El premio no fue reclamado.`
+              ? `Ningún hincha acertó los ${trivia.minuto_ganador_real} tiros de esquina en el partido. El premio no fue reclamado.`
               : `Ningún hincha acertó el gol de ${trivia.equipo_ganador_real} en el minuto ${trivia.minuto_ganador_real}'. El premio no fue reclamado.`
             : ganadores.length === 1
               ? `¡1 solo hincha acertó el resultado exacto! Le corresponde el 100% del premio (${premioTotal} Bs).`

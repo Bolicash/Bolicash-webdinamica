@@ -4,9 +4,6 @@ import { revalidatePath } from "next/cache";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 
 function normalizarPlantillaDb(p: string): string {
-  // La base de datos en Supabase tiene restricción: ('primer_gol_minuto', 'minuto_gol_equipo').
-  // Mapeamos 'tiros_esquina' a 'minuto_gol_equipo' para ser 100% compatible sin requerir migraciones DDL.
-  if (p === "tiros_esquina") return "minuto_gol_equipo";
   return p;
 }
 

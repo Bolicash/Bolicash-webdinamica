@@ -119,7 +119,7 @@ export default async function TriviasPage() {
                   <div className="mt-1">
                     <span className="inline-block rounded-boton border border-exito/20 bg-exito/10 px-2 py-0.5 font-mono text-[10px] font-bold text-exito">
                       {trivia.tipo_plantilla === "tiros_esquina" || trivia.tipo_plantilla === "minuto_gol_equipo"
-                        ? `CÓRNERS: ${trivia.equipo_ganador_real} (${trivia.minuto_ganador_real})`
+                        ? `CÓRNERS: ${trivia.minuto_ganador_real} en el partido`
                         : `GOL: ${trivia.equipo_ganador_real} (${trivia.minuto_ganador_real}')`}
                     </span>
                   </div>
@@ -253,7 +253,7 @@ export default async function TriviasPage() {
                       <div className="mt-1 whitespace-nowrap">
                         <span className="rounded-boton border border-exito/20 bg-exito/10 px-2 py-0.5 font-mono text-[10px] font-bold text-exito">
                           {trivia.tipo_plantilla === "tiros_esquina" || trivia.tipo_plantilla === "minuto_gol_equipo"
-                            ? `CÓRNERS: ${trivia.equipo_ganador_real} (${trivia.minuto_ganador_real})`
+                            ? `CÓRNERS: ${trivia.minuto_ganador_real} en el partido`
                             : `GOL: ${trivia.equipo_ganador_real} (${trivia.minuto_ganador_real}')`}
                         </span>
                       </div>

@@ -139,8 +139,8 @@ export default function ModalPronosticosEnVivo({
             </div>
           </div>
 
-          {/* Barra de Distribución */}
-          {pronosticos.length > 0 && (
+          {/* Barra de Distribución (Solo para dinámicas con elección de equipo) */}
+          {!esTirosEsquina && pronosticos.length > 0 && (
             <div className="mt-3 p-2 sm:p-2.5 rounded-xl bg-zinc-900/90 border border-zinc-800/80">
               <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-zinc-300 mb-1">
                 <span className="flex items-center gap-1 min-w-0">
@@ -191,44 +191,46 @@ export default function ModalPronosticosEnVivo({
               )}
             </div>
 
-            {/* Pestañas de filtro por equipo (Scroll horizontal sin scrollbar fea) */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-              <button
-                type="button"
-                onClick={() => setFiltroEquipo("todos")}
-                className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase transition-all whitespace-nowrap cursor-pointer shrink-0 ${
-                  filtroEquipo === "todos"
-                    ? "bg-dorado-500 text-zinc-950 font-black shadow-sm"
-                    : "bg-zinc-900 text-zinc-400 hover:text-blanco hover:bg-zinc-800 border border-zinc-800"
-                }`}
-              >
-                Todos ({pronosticos.length})
-              </button>
+            {/* Pestañas de filtro por equipo (solo en primer gol) */}
+            {!esTirosEsquina && (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                <button
+                  type="button"
+                  onClick={() => setFiltroEquipo("todos")}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase transition-all whitespace-nowrap cursor-pointer shrink-0 ${
+                    filtroEquipo === "todos"
+                      ? "bg-dorado-500 text-zinc-950 font-black shadow-sm"
+                      : "bg-zinc-900 text-zinc-400 hover:text-blanco hover:bg-zinc-800 border border-zinc-800"
+                  }`}
+                >
+                  Todos ({pronosticos.length})
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setFiltroEquipo(trivia.equipo_a)}
-                className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase transition-all whitespace-nowrap cursor-pointer shrink-0 ${
-                  filtroEquipo === trivia.equipo_a
-                    ? "bg-dorado-500 text-zinc-950 font-black shadow-sm"
-                    : "bg-zinc-900 text-zinc-400 hover:text-blanco hover:bg-zinc-800 border border-zinc-800"
-                }`}
-              >
-                {trivia.equipo_a} ({totalEquipoA})
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setFiltroEquipo(trivia.equipo_a)}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase transition-all whitespace-nowrap cursor-pointer shrink-0 ${
+                    filtroEquipo === trivia.equipo_a
+                      ? "bg-dorado-500 text-zinc-950 font-black shadow-sm"
+                      : "bg-zinc-900 text-zinc-400 hover:text-blanco hover:bg-zinc-800 border border-zinc-800"
+                  }`}
+                >
+                  {trivia.equipo_a} ({totalEquipoA})
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setFiltroEquipo(trivia.equipo_b)}
-                className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase transition-all whitespace-nowrap cursor-pointer shrink-0 ${
-                  filtroEquipo === trivia.equipo_b
-                    ? "bg-dorado-500 text-zinc-950 font-black shadow-sm"
-                    : "bg-zinc-900 text-zinc-400 hover:text-blanco hover:bg-zinc-800 border border-zinc-800"
-                }`}
-              >
-                {trivia.equipo_b} ({totalEquipoB})
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => setFiltroEquipo(trivia.equipo_b)}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase transition-all whitespace-nowrap cursor-pointer shrink-0 ${
+                    filtroEquipo === trivia.equipo_b
+                      ? "bg-dorado-500 text-zinc-950 font-black shadow-sm"
+                      : "bg-zinc-900 text-zinc-400 hover:text-blanco hover:bg-zinc-800 border border-zinc-800"
+                  }`}
+                >
+                  {trivia.equipo_b} ({totalEquipoB})
+                </button>
+              </div>
+            )}
           </div>
         </header>
 
@@ -270,16 +272,18 @@ export default function ModalPronosticosEnVivo({
                       <span className="block text-xs sm:text-sm font-bold text-blanco truncate leading-tight">
                         {p.nombre}
                       </span>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <span
-                          className={`inline-block h-1.5 w-1.5 rounded-full shrink-0 ${
-                            esEquipoA ? "bg-dorado-400" : "bg-emerald-400"
-                          }`}
-                        />
-                        <span className="text-[10px] sm:text-[11px] font-medium text-zinc-400 truncate">
-                          {p.equipo_seleccionado}
-                        </span>
-                      </div>
+                      {!esTirosEsquina && (
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span
+                            className={`inline-block h-1.5 w-1.5 rounded-full shrink-0 ${
+                              esEquipoA ? "bg-dorado-400" : "bg-emerald-400"
+                            }`}
+                          />
+                          <span className="text-[10px] sm:text-[11px] font-medium text-zinc-400 truncate">
+                            {p.equipo_seleccionado}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Pronóstico Resaltado */}

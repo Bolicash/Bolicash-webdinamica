@@ -269,7 +269,7 @@ export default function FormularioCrearTrivia({
                         ⚽ Primer gol y minuto (Quién anota primero y en qué minuto)
                       </option>
                       <option value="tiros_esquina">
-                        🚩 Tiros de esquina (Equipo y cantidad exacta de córners)
+                        🚩 Tiros de esquina (Cantidad total de córners del partido)
                       </option>
                     </select>
                   </div>

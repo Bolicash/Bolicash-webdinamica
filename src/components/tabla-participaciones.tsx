@@ -52,22 +52,26 @@ export default function TablaParticipaciones({
 
   const premioTotal = trivia.premio_monto ?? 100;
 
-  // Filtrar acertantes cuando se especifica equipo y minuto
+  // Filtrar acertantes cuando se especifica equipo y minuto (o solo córners para tiros de esquina)
   const minutoNum = filtroMinuto.trim() !== "" ? Number(filtroMinuto) : null;
-  const hayFiltroResultado = Boolean(
-    filtroEquipo && minutoNum !== null && !Number.isNaN(minutoNum) && minutoNum >= 0 && minutoNum <= 120
-  );
+  const hayFiltroResultado = esTirosEsquina
+    ? Boolean(minutoNum !== null && !Number.isNaN(minutoNum) && minutoNum >= 0 && minutoNum <= maxValor)
+    : Boolean(filtroEquipo && minutoNum !== null && !Number.isNaN(minutoNum) && minutoNum >= 0 && minutoNum <= maxValor);
 
   const acertantes = useMemo(() => {
     if (!hayFiltroResultado) return [];
     return filas
-      .filter(
-        (f) =>
+      .filter((f) => {
+        if (esTirosEsquina) {
+          return f.minuto_pronosticado === minutoNum;
+        }
+        return (
           f.equipo_seleccionado === filtroEquipo &&
           f.minuto_pronosticado === minutoNum
-      )
+        );
+      })
       .sort((a, b) => new Date(a.registrado_en).getTime() - new Date(b.registrado_en).getTime());
-  }, [filas, filtroEquipo, minutoNum, hayFiltroResultado]);
+  }, [filas, filtroEquipo, minutoNum, hayFiltroResultado, esTirosEsquina]);
 
   // Cálculo de división de premio equitativo con redondeo para el 1º que votó
   const repartoPremios = useMemo(() => {
@@ -99,13 +103,13 @@ export default function TablaParticipaciones({
   }, [filas, busqueda]);
 
   function manejarOficializar() {
-    if (!filtroEquipo || minutoNum === null) return;
+    if ((!esTirosEsquina && !filtroEquipo) || minutoNum === null) return;
     setErrorOficializar(null);
     setOficializando(true);
 
     const fd = new FormData();
     fd.set("trivia_id", trivia.id);
-    fd.set("equipo_ganador", filtroEquipo);
+    fd.set("equipo_ganador", esTirosEsquina ? "Total Partido" : filtroEquipo);
     fd.set("minuto_ganador", String(minutoNum));
 
     startTransition(() => {
@@ -136,7 +140,7 @@ export default function TablaParticipaciones({
               </h2>
               <p className="text-[11px] text-zinc-400">
                 {esTirosEsquina
-                  ? "Ingresa el equipo y la cantidad exacta de córners para calcular los acertantes y repartir el premio de "
+                  ? "Ingresa la cantidad total de tiros de esquina del partido para calcular los acertantes y repartir el premio de "
                   : "Ingresa el equipo que anotó y el minuto para calcular los acertantes y repartir el premio de "}
                 <strong className="text-secundario font-mono">{premioTotal} Bs</strong>.
               </p>
@@ -146,57 +150,59 @@ export default function TablaParticipaciones({
           {trivia.equipo_ganador_real != null && (
             <span className="rounded-full border border-secundario/50 bg-secundario/20 px-3 py-0.5 text-xs font-bold text-secundario">
               {esTirosEsquina
-                ? `✓ Resultado guardado: ${trivia.equipo_ganador_real} (${trivia.minuto_ganador_real} córners)`
+                ? `✓ Resultado guardado: ${trivia.minuto_ganador_real} córners en el partido`
                 : `✓ Resultado guardado: ${trivia.equipo_ganador_real} (${trivia.minuto_ganador_real}')`}
             </span>
           )}
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {/* Selector de Equipo: Botones directos sin menús desplegables que se desborden */}
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400">
-                {esTirosEsquina ? "Equipo" : "Equipo del gol"}
-              </label>
-              {filtroEquipo && (
-                <span className="font-mono text-[10px] font-bold text-secundario">
-                  ✓ {filtroEquipo}
-                </span>
-              )}
+        <div className={`mt-4 grid grid-cols-1 gap-3 ${esTirosEsquina ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
+          {/* Selector de Equipo solo para dinámicas de primer gol */}
+          {!esTirosEsquina && (
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                  Equipo del gol
+                </label>
+                {filtroEquipo && (
+                  <span className="font-mono text-[10px] font-bold text-secundario">
+                    ✓ {filtroEquipo}
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-1.5 h-[38px]">
+                <button
+                  type="button"
+                  onClick={() => setFiltroEquipo(filtroEquipo === trivia.equipo_a ? "" : trivia.equipo_a)}
+                  className={`flex items-center justify-center rounded-boton border px-2 text-xs font-bold transition-all truncate ${
+                    filtroEquipo === trivia.equipo_a
+                      ? "border-secundario bg-secundario text-superficie shadow-md shadow-secundario/20"
+                      : "border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-zinc-500 hover:text-superficie"
+                  }`}
+                  title={trivia.equipo_a}
+                >
+                  {trivia.equipo_a}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFiltroEquipo(filtroEquipo === trivia.equipo_b ? "" : trivia.equipo_b)}
+                  className={`flex items-center justify-center rounded-boton border px-2 text-xs font-bold transition-all truncate ${
+                    filtroEquipo === trivia.equipo_b
+                      ? "border-secundario bg-secundario text-superficie shadow-md shadow-secundario/20"
+                      : "border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-zinc-500 hover:text-superficie"
+                  }`}
+                  title={trivia.equipo_b}
+                >
+                  {trivia.equipo_b}
+                </button>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-1.5 h-[38px]">
-              <button
-                type="button"
-                onClick={() => setFiltroEquipo(filtroEquipo === trivia.equipo_a ? "" : trivia.equipo_a)}
-                className={`flex items-center justify-center rounded-boton border px-2 text-xs font-bold transition-all truncate ${
-                  filtroEquipo === trivia.equipo_a
-                    ? "border-secundario bg-secundario text-superficie shadow-md shadow-secundario/20"
-                    : "border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-zinc-500 hover:text-superficie"
-                }`}
-                title={trivia.equipo_a}
-              >
-                {trivia.equipo_a}
-              </button>
-              <button
-                type="button"
-                onClick={() => setFiltroEquipo(filtroEquipo === trivia.equipo_b ? "" : trivia.equipo_b)}
-                className={`flex items-center justify-center rounded-boton border px-2 text-xs font-bold transition-all truncate ${
-                  filtroEquipo === trivia.equipo_b
-                    ? "border-secundario bg-secundario text-superficie shadow-md shadow-secundario/20"
-                    : "border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-zinc-500 hover:text-superficie"
-                }`}
-                title={trivia.equipo_b}
-              >
-                {trivia.equipo_b}
-              </button>
-            </div>
-          </div>
+          )}
 
           {/* Minuto o Córners */}
           <div>
             <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-zinc-400">
-              {esTirosEsquina ? "Cantidad de tiros de esquina (0 - 30)" : "Minuto exacto (0 - 120)"}
+              {esTirosEsquina ? "Cantidad total de tiros de esquina (0 - 30)" : "Minuto exacto (0 - 120)"}
             </label>
             <input
               type="number"
@@ -217,7 +223,9 @@ export default function TablaParticipaciones({
               onClick={manejarOficializar}
               title={
                 !hayFiltroResultado
-                  ? "Selecciona el equipo y la cantidad para habilitar el guardado"
+                  ? esTirosEsquina
+                    ? "Ingresa la cantidad de córners para habilitar el guardado"
+                    : "Selecciona el equipo y la cantidad para habilitar el guardado"
                   : "Calcular y registrar ganadores oficiales"
               }
               className="flex w-full items-center justify-center gap-2 rounded-boton bg-secundario px-4 py-2.5 text-xs font-black uppercase tracking-wider text-superficie hover:bg-esmeralda-700 shadow-sm shadow-secundario/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
@@ -226,7 +234,7 @@ export default function TablaParticipaciones({
             </button>
             {!hayFiltroResultado && (
               <span className="mt-1 block text-[10px] text-zinc-500 text-center sm:text-left">
-                * Selecciona equipo y cantidad para habilitar
+                * {esTirosEsquina ? "Ingresa la cantidad para habilitar" : "Selecciona equipo y cantidad para habilitar"}
               </span>
             )}
           </div>
@@ -361,8 +369,10 @@ export default function TablaParticipaciones({
           {filtradas.map((fila, indice) => {
             const acerto =
               hayFiltroResultado &&
-              fila.equipo_seleccionado === filtroEquipo &&
-              fila.minuto_pronosticado === minutoNum;
+              (esTirosEsquina
+                ? fila.minuto_pronosticado === minutoNum
+                : fila.equipo_seleccionado === filtroEquipo &&
+                  fila.minuto_pronosticado === minutoNum);
 
             return (
               <div
@@ -397,9 +407,11 @@ export default function TablaParticipaciones({
                     </a>
                   </div>
 
-                  <span className="shrink-0 rounded-boton border border-borde bg-primario-claro px-2.5 py-1 text-xs font-black text-texto">
-                    {fila.equipo_seleccionado}
-                  </span>
+                  {!esTirosEsquina && (
+                    <span className="shrink-0 rounded-boton border border-borde bg-primario-claro px-2.5 py-1 text-xs font-black text-texto">
+                      {fila.equipo_seleccionado}
+                    </span>
+                  )}
                 </div>
 
                 {/* Pronóstico y Fecha de Registro */}
@@ -437,9 +449,9 @@ export default function TablaParticipaciones({
                 <th className="px-4 py-2.5 font-bold whitespace-nowrap">#</th>
                 <th className="px-4 py-2.5 font-bold whitespace-nowrap min-w-[140px]">Participante</th>
                 <th className="px-4 py-2.5 font-bold whitespace-nowrap">WhatsApp</th>
-                <th className="px-4 py-2.5 font-bold whitespace-nowrap">Equipo Elegido</th>
+                {!esTirosEsquina && <th className="px-4 py-2.5 font-bold whitespace-nowrap">Equipo Elegido</th>}
                 <th className="px-4 py-2.5 font-bold whitespace-nowrap">
-                  {esTirosEsquina ? "Tiros de Esquina" : "Minuto"}
+                  {esTirosEsquina ? "Tiros de Esquina (Total)" : "Minuto"}
                 </th>
                 <th className="px-4 py-2.5 font-bold whitespace-nowrap">Fecha / Hora de Registro</th>
               </tr>
@@ -448,8 +460,10 @@ export default function TablaParticipaciones({
               {filtradas.map((fila, indice) => {
                 const acerto =
                   hayFiltroResultado &&
-                  fila.equipo_seleccionado === filtroEquipo &&
-                  fila.minuto_pronosticado === minutoNum;
+                  (esTirosEsquina
+                    ? fila.minuto_pronosticado === minutoNum
+                    : fila.equipo_seleccionado === filtroEquipo &&
+                      fila.minuto_pronosticado === minutoNum);
 
                 return (
                   <tr
@@ -480,11 +494,13 @@ export default function TablaParticipaciones({
                         {fila.whatsapp}
                       </a>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="inline-block rounded-boton border border-borde bg-primario-claro px-2.5 py-0.5 text-xs font-bold text-texto">
-                        {fila.equipo_seleccionado}
-                      </span>
-                    </td>
+                    {!esTirosEsquina && (
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="inline-block rounded-boton border border-borde bg-primario-claro px-2.5 py-0.5 text-xs font-bold text-texto">
+                          {fila.equipo_seleccionado}
+                        </span>
+                      </td>
+                    )}
                     <td className="px-4 py-3 font-mono font-bold text-texto whitespace-nowrap">
                       {fila.minuto_pronosticado}
                       {esTirosEsquina ? " córners" : "'"}
